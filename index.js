@@ -8,8 +8,6 @@ app.get('/', (req, res)=>{
 })
 
 
-
-
-http.listen(null,null,()=>{
-  console.log('listening');
+var listener = http.listen(null,null,()=>{
+  console.log('listening on port ' + listener.address().port);
 });
