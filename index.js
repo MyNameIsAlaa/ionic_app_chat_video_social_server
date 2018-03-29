@@ -10,6 +10,6 @@ app.get('/', (req, res)=>{
 
 
 
-http.listen(9999,null,()=>{
-  console.log('listening on port 9999');
+http.listen(null,null,()=>{
+  console.log('listening');
 });
