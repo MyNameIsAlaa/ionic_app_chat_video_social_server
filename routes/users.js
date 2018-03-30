@@ -20,12 +20,12 @@ Router.get('/:userID', passport.authenticate('jwt', { session: false }), (req,re
      if(! Mongoose.Types.ObjectId.isValid(req.params.userID)) return res.status(402).send("USER ID NOT VALID!");
      var id = Mongoose.Types.ObjectId(req.params.userID)
       User.findOne({_id: id},(error, user)=>{
-           if(error) return res.status(402).send(error);
-           if(!user)  return res.status(402).send("USER NOT FOUND!");
+           if(error) return res.status(500).send(error);
+           if(!user)  return res.status(500).send("USER NOT FOUND!");
            res.status(200).send(user);
       });
     }else{
-      res.status(402).send("USER ID IS REQUIRED!");
+      res.status(500).send("USER ID IS REQUIRED!");
     }
 });
 
@@ -46,8 +46,8 @@ newData.password = req.body.password;
 
 var newUser = new User(newData);
  newUser.save((error, user)=>{
-  if(error)  return res.status(402).send(error);
-  if(!user)  return res.status(402).send("USER NOT FOUND!");
+  if(error)  return res.status(500).send(error);
+  if(!user)  return res.status(500).send("USER NOT FOUND!");
   res.status(200).send(user);
  });
  
@@ -60,10 +60,10 @@ Router.post('/login', (req, res)=>{
   PostData = {};
 
   if(! req.body.username){
-    res.status(402).send("USERNAME IS REQUIRED")
+    res.status(500).send("USERNAME IS REQUIRED")
   }
   if(! req.body.password){
-    res.status(402).send("PASSWORD IS REQUIRED")
+    res.status(500).send("PASSWORD IS REQUIRED")
   }
 
   User.findOne({
