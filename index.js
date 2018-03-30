@@ -43,6 +43,7 @@ app.use('/api/friends', Friends_Router);
 io.on('connection', function (socket) {
 
     socket.on("connect", (data)=>{
+        socket.emit("connect", "welcome!");
         OnlineUsers.push({
             sid: socket.id,
             uid: data.id
