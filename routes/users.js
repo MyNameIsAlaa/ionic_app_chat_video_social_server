@@ -32,7 +32,7 @@ Router.get('/:userID', passport.authenticate('jwt', { session: false }), (req,re
 });
 
 
-Router.post('/', passport.authenticate('jwt', { session: false }) , (req,res)=>{
+Router.post('/signup', (req,res)=>{
 
 newData = {};
 
