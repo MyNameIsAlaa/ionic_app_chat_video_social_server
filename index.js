@@ -8,6 +8,6 @@ app.get('/', (req, res)=>{
 })
 
 
-var listener = http.listen(null,null,()=>{
+var listener = http.listen(process.env.PORT || 8080,()=>{
   console.log('listening on port ' + listener.address().port);
 });
