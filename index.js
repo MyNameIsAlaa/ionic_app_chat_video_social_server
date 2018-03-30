@@ -15,6 +15,9 @@ var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 
 
+var OnlineUsers = [];
+
+
 var opts = {}
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = 'NineVisions';
@@ -38,7 +41,14 @@ app.use('/api/friends', Friends_Router);
 
 
 io.on('connection', function (socket) {
-     console.log(socket.id);
+
+    socket.on("connect", (data)=>{
+        OnlineUsers.push({
+            sid: socket.id,
+            uid: data.id
+        });
+    });
+
 });
 
 
