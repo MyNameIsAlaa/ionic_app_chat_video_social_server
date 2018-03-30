@@ -17,7 +17,7 @@ Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
  
 Router.get('/:userID', passport.authenticate('jwt', { session: false }), (req,res)=>{
    if(req.params.userID){
-     if(! Mongoose.Types.ObjectId.isValid(req.params.userID)) return res.status(402).send("USER ID NOT VALID!");
+     if(! Mongoose.Types.ObjectId.isValid(req.params.userID)) return res.status(500).send("USER ID NOT VALID!");
      var id = Mongoose.Types.ObjectId(req.params.userID)
       User.findOne({_id: id},(error, user)=>{
            if(error) return res.status(500).send(error);
