@@ -1,11 +1,37 @@
+
+var config = require("./config/config");
 var app = require("express")();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var Mongose = require("mongoose");
+var User_Router = require('./routes/users');
+var bodyParser = require("body-parser");
+var User = require("./db/models/Uses");
+var passport = require("passport");
+var JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
 
 
-app.get('/', (req, res)=>{
-   res.send('welcome!');
-})
+var opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = 'NineVisions';
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+    User.findOne({id: jwt_payload.sub}, function(err, user) {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+        }
+    });
+}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use('/api/user', User_Router);
+
+
 
 
 var listener = http.listen(process.env.PORT || 8080,()=>{
