@@ -4,7 +4,10 @@ var app = require("express")();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Mongose = require("mongoose");
+
 var User_Router = require('./routes/users');
+var Friends_Router = require('./routes/friends');
+
 var bodyParser = require("body-parser");
 var User = require("./db/models/Uses");
 var passport = require("passport");
@@ -29,7 +32,9 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+
 app.use('/api/user', User_Router);
+app.use('/api/friends', Friends_Router);
 
 
 
