@@ -13,9 +13,40 @@ Mongoose.connect(config.mlab.URL,(error)=>{
 
 
 Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
-  res.send(req.user);
- });
+  
+});
 
 
+
+Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
+   //get friend id
+   //add it db for loggedin user
+  var NewFriend =  Friend({
+      Owner: req.user._id,
+      FriendID: req.body.userID
+   });
+
+   NewFriend.save((error, result)=>{
+     if(error) return res.status(500).json({"error": error});
+     if(result) return res.status(200).json({"success": "Friend Added!"});
+   });
+
+});
+
+
+Router.post('/delete', passport.authenticate('jwt', {session: false}), (req,res)=>{
+    //get friend id
+    //add it db for loggedin user
+   Friend.findOne({
+       Ownser: req.user._id,
+       FriendID: req.body.userID
+   }).remove((error)=>{
+      if(error) return res.status(500).json({"error": error});
+      res.status(200).json({"success": "Friend deleted!"});
+   });
  
+ });
+ 
+
+
 module.exports = Router;
