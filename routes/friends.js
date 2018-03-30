@@ -20,7 +20,6 @@ Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
 });
 
 
-
 Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
    //get friend id
    //add it db for loggedin user
