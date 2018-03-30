@@ -10,8 +10,8 @@ Mongoose.connect(config.mlab.URL,(error)=>{
 });
 
 
-Router.get('/', (req,res)=>{
-  res.send("WELCOME TO OUR API!");
+Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
+  res.send(req.user);
  });
 
  
@@ -45,8 +45,6 @@ newData.password = req.body.password;
 }
 
 var newUser = new User(newData);
-
-
  newUser.save((error, user)=>{
   if(error)  return res.status(402).send(error);
   if(!user)  return res.status(402).send("USER NOT FOUND!");
@@ -68,7 +66,6 @@ Router.post('/login', (req, res)=>{
     res.status(402).send("PASSWORD IS REQUIRED")
   }
 
- 
   User.findOne({
     username: req.body.username,
     password: req.body.password
