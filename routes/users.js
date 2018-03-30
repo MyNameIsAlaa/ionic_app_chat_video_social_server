@@ -73,7 +73,14 @@ Router.post('/login', (req, res)=>{
     username: req.body.username,
     password: req.body.password
   }, (error, user)=>{
-    res.status(200).json({ "token": JWT.sign({_id: user._id}, "NineVisions")  });
+    res.status(200).json({
+       "token": JWT.sign({_id: user._id}, "NineVisions"), 
+       "_id": user._id,
+       "username": user.username,
+       "email": user.email,
+       "first_name": user.first_name,
+       "last_name": user.last_name,
+      });
   });
 
 });
