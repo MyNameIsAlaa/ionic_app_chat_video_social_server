@@ -25,7 +25,7 @@ Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
    //add it db for loggedin user
   var NewFriend =  Friend({
       Owner: req.user._id,
-      FriendID: req.body.userID
+      Friend: req.body.userID
    });
 
    NewFriend.save((error, result)=>{
@@ -41,7 +41,7 @@ Router.post('/delete', passport.authenticate('jwt', {session: false}), (req,res)
     //add it db for loggedin user
    Friend.findOne({
        Ownser: req.user._id,
-       FriendID: req.body.userID
+       Friend: req.body.userID
    }).remove((error)=>{
       if(error) return res.status(500).json({"error": error});
       res.status(200).json({"success": "Friend deleted!"});
