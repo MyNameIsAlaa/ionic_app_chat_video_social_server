@@ -37,6 +37,10 @@ app.use('/api/user', User_Router);
 app.use('/api/friends', Friends_Router);
 
 
+io.on('connection', function (socket) {
+     console.log(socket.id);
+});
+
 
 
 var listener = http.listen(process.env.PORT || 8080,()=>{
