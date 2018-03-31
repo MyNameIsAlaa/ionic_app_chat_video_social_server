@@ -47,7 +47,9 @@ io.on('connection', function (socket) {
         //dataA[socket.id] = data.id;
         //dataB[data.id] = socket.id;
         if(! Mongose.Types.ObjectId.isValid(data.id)) return;
-        User.find({_id: Mongose.Types.ObjectId(data.id)},(err, result)=>{
+        User.findOne({_id: Mongose.Types.ObjectId(data.id)},(err, result)=>{
+            if(err) return;
+            if(! result) return;
             result.online = true;
             result.socket = socket.id;
             result.save((err)=>{
