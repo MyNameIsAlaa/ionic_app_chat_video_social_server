@@ -10,6 +10,8 @@ var Friends_Router = require('./routes/friends');
 
 var bodyParser = require("body-parser");
 var User = require("./db/models/Uses");
+var Friends = require("./db/models/friends");
+
 var passport = require("passport");
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
@@ -44,8 +46,6 @@ app.use('/api/friends', Friends_Router);
 
 io.on('connection', function (socket) {
     socket.on("id", (data)=>{
-        //dataA[socket.id] = data.id;
-        //dataB[data.id] = socket.id;
         if(! Mongose.Types.ObjectId.isValid(data.id)) return;
         User.findOne({_id: Mongose.Types.ObjectId(data.id)},(err, result)=>{
             if(err) return;
@@ -54,7 +54,17 @@ io.on('connection', function (socket) {
             result.socket = socket.id;
             result.save((err)=>{
             })
-        })
+            Friends.find({Owner: Mongose.Types.ObjectId(data.id) }).populate({
+                path: "Friend",
+                match: { online: true }
+            }).exec((err,friends)=>{
+                friends.forEach(friend => {
+                    socket.to(friend.socket).emit('friend_online', {from: data.id});
+                });
+            });
+        });
+        
+        // get all user friends who are online and emit to them he is online now!
     });
     
     socket.on('disconnect', (reason) => {
@@ -65,17 +75,23 @@ io.on('connection', function (socket) {
             result.socket = '';
             result.save((err)=>{
             })
-        })
+            Friends.find({Owner: Mongose.Types.ObjectId(result._id) }).populate({
+                path: "Friend",
+                match: { online: true }
+            }).exec((err,friends)=>{
+                friends.forEach(friend => {
+                    socket.to(friend.socket).emit('friend_offline', {from: result.id});
+                });
+            });
+        });
     });
 
     socket.on('private message', (data)=>{
-
-
            //data =  { from: ,to: , message: }
            if(! Mongose.Types.ObjectId.isValid(data.to)) return;
            User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
                  if(user.online){
-                      // user is online send it   socket.to(<socketid>).emit('hey', 'I just met you');
+                      // user is online send it socket.to(<socketid>).emit('hey', 'I just met you');
                         socket.to(user.socket).emit('incoming_message',{
                             from: data.from,
                             message: data.message 
@@ -85,12 +101,10 @@ io.on('connection', function (socket) {
                      console.log("+++ reciever " + data.to + "is not online! +++");
                  }
            })
-   
-
-       //console.log(Object.keys(dataA).length); //online users count
-    });
+       });
 
 
+ 
 });
 
 
