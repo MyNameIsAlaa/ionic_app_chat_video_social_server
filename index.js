@@ -22,7 +22,7 @@ var opts = {}
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = 'NineVisions';
 passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
-    User.findOne({id: jwt_payload.sub}, function(err, user) {
+    User.findOne({id: jwt_payload.sub}).select("-password").exec(function(err, user) {
         if (err) {
             return done(err, false);
         }
@@ -33,6 +33,7 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
         }
     });
 }));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
