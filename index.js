@@ -82,6 +82,7 @@ io.on('connection', function (socket) {
                         });
                  }else{
                      //user not online save to offline message
+                     console.log("reciever" + data.to + "is not online!");
                  }
            })
    
