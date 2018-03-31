@@ -62,8 +62,7 @@ io.on('connection', function (socket) {
                     socket.to(friend.socket).emit('friend_online', {from: data.id});
                 });
             });
-        });
-        
+        });     
         // get all user friends who are online and emit to them he is online now!
     });
     
@@ -98,7 +97,7 @@ io.on('connection', function (socket) {
                         });
                  }else{
                      //user not online save to offline message
-                     console.log("+++ reciever " + data.to + "is not online! +++");
+                     console.log("+++ reciever " + data.to + " is not online! +++");
                  }
            })
        });
