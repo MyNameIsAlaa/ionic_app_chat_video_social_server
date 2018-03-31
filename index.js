@@ -59,7 +59,7 @@ io.on('connection', function (socket) {
                 match: { online: true }
             }).exec((err,friends)=>{
                 friends.forEach(item => {
-                    socket.to(item.Friend.socket).emit('friend_online', {from: data.id});
+                    socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
                 });
             });
         });     
@@ -79,7 +79,7 @@ io.on('connection', function (socket) {
                 match: { online: true }
             }).exec((err,friends)=>{
                 friends.forEach(item => {
-                    socket.to(item.Friend.socket).emit('friend_offline', {from: result.id});
+                    socket.to(item.Friend.socket).emit('friend_offline', {id: result._id});
                 });
             });
         });
