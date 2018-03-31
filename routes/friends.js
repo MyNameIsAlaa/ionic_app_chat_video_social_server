@@ -37,10 +37,9 @@ Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
 
 
 Router.post('/delete', passport.authenticate('jwt', {session: false}), (req,res)=>{
-    //get friend id
-    //add it db for loggedin user
+
    Friend.findOne({
-       Ownser: req.user._id,
+       Owner: req.user._id,
        Friend: req.body.userID
    }).remove((error)=>{
       if(error) return res.status(500).json({"error": error});
