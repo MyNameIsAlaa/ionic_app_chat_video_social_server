@@ -21,11 +21,11 @@ Router.get('/:userID', passport.authenticate('jwt', { session: false }), (req,re
    if(req.params.userID){
      if(! Mongoose.Types.ObjectId.isValid(req.params.userID)) return res.status(500).json({"error": "USER ID NOT VALID!"});
      var id = Mongoose.Types.ObjectId(req.params.userID)
-      User.findOne({_id: id},(error, user)=>{
-           if(error) return res.status(500).json({"error": error});
-           if(!user)  return res.status(500).json({"error": "USER NOT FOUND!"});
-           res.status(200).json({"user": user});
-      });
+      User.findOne({_id: id}).select("-password").exec((error, user)=>{
+        if(error) return res.status(500).json({"error": error});
+        if(!user)  return res.status(500).json({"error": "USER NOT FOUND!"});
+        res.status(200).json({"user": user});
+       });
     }else{
       res.status(500).json({"error": "USER ID IS REQUIRED!"});
     }
@@ -71,14 +71,10 @@ Router.post('/login', (req, res)=>{
   User.findOne({
     username: req.body.username,
     password: req.body.password
-  }, (error, user)=>{
+  }).select("-passsword").exec( (error, user)=>{
     res.status(200).json({
        "token": JWT.sign({_id: user._id}, "NineVisions"), 
-       "_id": user._id,
-       "username": user.username,
-       "email": user.email,
-       "first_name": user.first_name,
-       "last_name": user.last_name,
+       "user": user
       });
   });
 
