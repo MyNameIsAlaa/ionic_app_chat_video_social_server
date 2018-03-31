@@ -53,7 +53,6 @@ io.on('connection', function (socket) {
             result.online = true;
             result.socket = socket.id;
             result.save((err)=>{
-                if(error) return res.status(500).json({"error":error});
             })
         })
     });
@@ -65,7 +64,6 @@ io.on('connection', function (socket) {
             result.online = false;
             result.socket = '';
             result.save((err)=>{
-                if(error) return res.status(500).json({"error":error});
             })
         })
     });
