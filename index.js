@@ -2,6 +2,7 @@
 var config = require("./config/config");
 var app = require("express")();
 var http = require('http').Server(app);
+var ExpressPeerServer = require('peer').ExpressPeerServer;
 var io = require('socket.io')(http);
 var Mongose = require("mongoose");
 
@@ -41,6 +42,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/api/user', User_Router);
 app.use('/api/friends', Friends_Router);
 
+var options = {
+    debug: true
+}
+app.use('/peerjs', ExpressPeerServer(http, options));
 //var dataA = [], dataB = [];
 
 
