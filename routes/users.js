@@ -71,7 +71,7 @@ Router.post('/login', (req, res)=>{
   User.findOne({
     username: req.body.username,
     password: req.body.password
-  }).select("-passsword").exec((error, user)=>{
+  }).select("-password").exec((error, user)=>{
     if(error) return res.status(500).json({"error":error});
     if(! user) return res.status(500).json({"error":"USER NOT FOUND"});
     res.status(200).json({
