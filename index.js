@@ -74,6 +74,7 @@ io.on('connection', function (socket) {
            //data =  { from: ,to: , message: }
            if(! Mongose.Types.ObjectId.isValid(data.to)) return;
            User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
+               console.log(user);
                  if(user.online){
                       // user is online send it   socket.to(<socketid>).emit('hey', 'I just met you');
                         socket.to(user.socket).emit('incoming_message',{
