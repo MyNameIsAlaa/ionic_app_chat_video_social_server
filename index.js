@@ -71,8 +71,7 @@ io.on('connection', function (socket) {
             }).exec((err,friends)=>{
                 if(!friends) return;
                 friends.forEach(item => {
-                    console.log(item)
-                   // socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
+                    if(item) socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
                 });
             });
         });     
@@ -92,7 +91,7 @@ io.on('connection', function (socket) {
                 match: { online: true }
             }).exec((err,friends)=>{
                 friends.forEach(item => {
-                    socket.to(item.Friend.socket).emit('friend_offline', {id: result._id});
+                    if(item) socket.to(item.Friend.socket).emit('friend_offline', {id: result._id});
                 });
             });
         });
