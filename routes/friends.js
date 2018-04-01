@@ -36,9 +36,9 @@ Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
         return res.status(500).json({"message":"YOU CAN'T ADD YOUR ACCOUNT"})
       }
 
-   Friend.findOne({Owner: req.user._id, Friend: req.body.userID}, (err, res)=>{
+   Friend.findOne({Owner: req.user._id, Friend: req.body.userID}, (err, user)=>{
        if(err) return res.status(500).json({"message": "Error Searching for contact!"});
-       if(res) return res.status(500).json({"message": "Friend already added!"});
+       if(user) return res.status(500).json({"message": "Friend already added!"});
        var NewFriend =  Friend({
           Owner: req.user._id,
           Friend: req.body.userID
