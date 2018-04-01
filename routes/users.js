@@ -31,6 +31,19 @@ Router.get('/:userID', passport.authenticate('jwt', { session: false }), (req,re
     }
 });
 
+Router.post('/search', passport.authenticate('jwt', { session: false }), (req,res)=>{
+  if(req.body.username){
+     User.findOne({username: req.body.username}).select("-password").exec((error, user)=>{
+       if(error) return res.status(500).json({"message": error});
+       if(!user)  return res.status(500).json({"message": "USER NOT FOUND!"});
+       res.status(200).json({"user": user});
+      });
+   }else{
+     res.status(500).json({"message": "USER ID IS REQUIRED!"});
+   }
+});
+
+
 
 Router.post('/signup', (req,res)=>{
 

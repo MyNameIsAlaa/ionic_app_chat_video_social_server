@@ -26,19 +26,20 @@ Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
 });
 
 
+
 Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
-   //get friend id
-   //add it db for loggedin user
-  var NewFriend =  Friend({
-      Owner: req.user._id,
-      Friend: req.body.userID
+   Friend.findOne({Owner: req.user._id, Friend: req.body.userID}, (err, res)=>{
+       if(err) return res.status(500).json({"message": "Error Searching for contact!"});
+       if(res) return res.status(500).json({"message": "Friend already added!"});
+       var NewFriend =  Friend({
+          Owner: req.user._id,
+          Friend: req.body.userID
+        });
+        NewFriend.save((error, result)=>{
+         if(error) return res.status(500).json({"error": error});
+         if(result) return res.status(200).json({"success": "Friend Added!"});
+       });
    });
-
-   NewFriend.save((error, result)=>{
-     if(error) return res.status(500).json({"error": error});
-     if(result) return res.status(200).json({"success": "Friend Added!"});
-   });
-
 });
 
 
