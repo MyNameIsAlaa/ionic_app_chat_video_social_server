@@ -71,7 +71,8 @@ io.on('connection', function (socket) {
             }).exec((err,friends)=>{
                 if(!friends) return;
                 friends.forEach(item => {
-                    socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
+                    console.log(item)
+                   // socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
                 });
             });
         });     
