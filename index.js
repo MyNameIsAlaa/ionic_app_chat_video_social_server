@@ -69,6 +69,7 @@ io.on('connection', function (socket) {
                 path: "Friend",
                 match: { online: true }
             }).exec((err,friends)=>{
+                if(!friends) return;
                 friends.forEach(item => {
                     socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
                 });
