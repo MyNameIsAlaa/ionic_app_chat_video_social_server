@@ -69,9 +69,8 @@ io.on('connection', function (socket) {
                 path: "Friend",
                 match: { online: true }
             }).exec((err,friends)=>{
-                if(!friends) return;
                 friends.forEach(item => {
-                    if(item) socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
+                    if(item.Friend.socket) socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
                 });
             });
         });     
@@ -91,7 +90,7 @@ io.on('connection', function (socket) {
                 match: { online: true }
             }).exec((err,friends)=>{
                 friends.forEach(item => {
-                    if(item) socket.to(item.Friend.socket).emit('friend_offline', {id: result._id});
+                    if(item.Friend.socket) socket.to(item.Friend.socket).emit('friend_offline', {id: result._id});
                 });
             });
         });
