@@ -95,10 +95,9 @@ Router.post('/login', (req, res)=>{
   if(! req.body.password){
     res.status(500).json({"message": "PASSWORD IS REQUIRED"});
   }
-  console.log(String(req.body.username).trim().toLowerCase());
   User.findOne({
     username: String(req.body.username).trim().toLowerCase(),
-    password: String(req.body.PASSWORD).trim()
+    password: String(req.body.password).trim()
   }).select("-password").exec((error, user)=>{
     if(error) return res.status(500).json({"message":"Unable to login"});
     if(! user) return res.status(500).json({"message":"WRONG USERNAME & PASSWORD!"});
