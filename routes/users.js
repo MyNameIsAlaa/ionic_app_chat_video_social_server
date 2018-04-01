@@ -46,12 +46,20 @@ if(req.body.password){
 newData.password = req.body.password;
 }
 
-var newUser = new User(newData);
- newUser.save((error, user)=>{
-  if(error)  return res.status(500).json({"message": error});
-  if(!user)  return res.status(500).json({"message": "USER NOT FOUND!"});
-  res.status(200).json(user);
- });
+User.findOne({
+  username: req.body.username,
+}).exec((err, user)=>{
+   if(user) return res.status(500).json({"message": "USERNAME IS TAKEN!"});
+   var newUser = new User(newData);
+   newUser.save((error, user)=>{
+    if(error)  return res.status(500).json({"message": "Unable to signuo now."});
+    if(!user)  return res.status(500).json({"message": "Unable to signuo now."});
+    res.status(200).json(user);
+   });
+})
+
+
+
  
 });
 
@@ -72,8 +80,8 @@ Router.post('/login', (req, res)=>{
     username: req.body.username,
     password: req.body.password
   }).select("-password").exec((error, user)=>{
-    if(error) return res.status(500).json({"message":error});
-    if(! user) return res.status(500).json({"message":"USER NOT FOUND"});
+    if(error) return res.status(500).json({"message":"Unable to login"});
+    if(! user) return res.status(500).json({"message":"WRONG USERNAME & PASSWORD!"});
     res.status(200).json({
        "token": JWT.sign({_id: user._id}, "NineVisions"), 
        "user": user
