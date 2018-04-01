@@ -72,7 +72,7 @@ Router.post('/login', (req, res)=>{
     username: req.body.username,
     password: req.body.password
   }).select("-password").exec((error, user)=>{
-    if(error) return res.status(500).json({"error":error});
+    if(error) return res.status(500).json(error);
     if(! user) return res.status(500).json({"error":"USER NOT FOUND"});
     res.status(200).json({
        "token": JWT.sign({_id: user._id}, "NineVisions"), 
