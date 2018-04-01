@@ -28,6 +28,14 @@ Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
 
 
 Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
+   
+      if(! req.body.userID){
+        return res.status(500).json({"message":"USER ID IS REQUIRED"})
+      }
+      if(req.user._id == req.body.userID){
+        return res.status(500).json({"message":"YOU CAN'T ADD YOUR ACCOUNT"})
+      }
+
    Friend.findOne({Owner: req.user._id, Friend: req.body.userID}, (err, res)=>{
        if(err) return res.status(500).json({"message": "Error Searching for contact!"});
        if(res) return res.status(500).json({"message": "Friend already added!"});
