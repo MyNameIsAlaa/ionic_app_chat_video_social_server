@@ -33,7 +33,8 @@ Router.get('/:userID', passport.authenticate('jwt', { session: false }), (req,re
 
 Router.post('/search', passport.authenticate('jwt', { session: false }), (req,res)=>{
   if(req.body.username){
-     User.findOne({username: req.body.username}).select("-password").exec((error, user)=>{
+     let username = String(req.body.username).trim().toLowerCase();
+     User.findOne({username: username}).select("-password").exec((error, user)=>{
        if(error) return res.status(500).json({"message": error});
        if(!user)  return res.status(500).json({"message": "USER NOT FOUND!"});
        res.status(200).json({"user": user});
@@ -50,13 +51,19 @@ Router.post('/signup', (req,res)=>{
 newData = {};
 
 if(req.body.username){
-newData.username = req.body.username;
+newData.username =  String(req.body.username).trim().toLowerCase();
+}else{
+  return res.status(500).json({"message": "USERNAME IS REQUIRED!"});
 }
 if(req.body.email){
-newData.email = req.body.email;
+newData.email =  String(req.body.username).trim();
+}else{
+  return res.status(500).json({"message": "EMAIL IS REQUIRED!"});
 }
 if(req.body.password){
 newData.password = req.body.password;
+}else{
+  return res.status(500).json({"message": "PASSWORD IS REQUIRED!"});
 }
 
 User.findOne({
@@ -90,8 +97,8 @@ Router.post('/login', (req, res)=>{
   }
 
   User.findOne({
-    username: req.body.username,
-    password: req.body.password
+    username: String(req.body.username).trim().toLowerCase(),
+    password: String(req.body.PASSWORD).trim()
   }).select("-password").exec((error, user)=>{
     if(error) return res.status(500).json({"message":"Unable to login"});
     if(! user) return res.status(500).json({"message":"WRONG USERNAME & PASSWORD!"});
