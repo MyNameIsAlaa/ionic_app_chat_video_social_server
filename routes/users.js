@@ -95,7 +95,7 @@ Router.post('/login', (req, res)=>{
   if(! req.body.password){
     res.status(500).json({"message": "PASSWORD IS REQUIRED"});
   }
-
+  console.log(String(req.body.username).trim().toLowerCase());
   User.findOne({
     username: String(req.body.username).trim().toLowerCase(),
     password: String(req.body.PASSWORD).trim()
