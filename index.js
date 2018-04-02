@@ -54,6 +54,10 @@ var options = {
 app.use('/peerjs', ExpressPeerServer(http, options));
 //var dataA = [], dataB = [];
 
+server.on('connection', function(id) { 
+    console.log(id)
+ });
+
 
 io.on('connection', function (socket) {
     socket.on("id", (data)=>{
