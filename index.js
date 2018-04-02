@@ -97,6 +97,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('private message', (data)=>{
+          console.log(data);
            //data =  { from: ,to: , message: }
            if(! Mongose.Types.ObjectId.isValid(data.to)) return;
            User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
