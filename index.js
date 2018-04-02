@@ -104,7 +104,8 @@ io.on('connection', function (socket) {
                       // user is online send it socket.to(<socketid>).emit('hey', 'I just met you');
                         socket.to(user.socket).emit('incoming_message',{
                             from: data.from,
-                            message: data.message 
+                            message: data.message,
+                            username: data.username
                         });
                  }else{
                      //user not online save to offline message
