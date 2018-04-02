@@ -13,7 +13,7 @@ Mongoose.connect(config.mlab.URL,(error)=>{
 
 
 Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
-    Friend.find({Owner:Mongoose.Types.ObjectId(req.user._id)}).populate("Friend", "-password").exec((error, friends)=>{
+    Friend.find({Owner: Mongoose.Types.ObjectId(req.user._id)}).populate("Friend", "-password").exec((error, friends)=>{
         if(error) return res.status(500).json({"error": error});
         let data = [];
         if(friends){
