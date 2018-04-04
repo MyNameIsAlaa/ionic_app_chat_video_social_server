@@ -83,7 +83,7 @@ io.on('connection', function (socket) {
             Message.find({to: Mongose.Types.ObjectId(data.id) }, (err, messages)=>{
                 messages.forEach((msg)=>{
                   socket.to(socket.id).emit('incoming_message',{from: msg.from,message: msg.message, username: msg.username});
-                  console.log({socket: socket.id, userid: data.i});
+                  console.log({socket: socket.id, userid: data.id});
                   Message.findByIdAndRemove(msg._id).exec();
               });
           });
