@@ -19,8 +19,7 @@ var passport = require("passport");
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 
-var admin = require("firebase-admin");
-
+var forEach = require('async-foreach').forEach;
 
 var admin = require("firebase-admin");
 
@@ -94,13 +93,19 @@ io.on('connection', function (socket) {
             });
             Message.find({to: Mongose.Types.ObjectId(data.id) }, (err, messages)=>{
                 if(err) return;
-               // var bulk = [];
+              /*
                 if(!messages) return;
                 messages.forEach((msg)=>{
-               //   bulk.push({from: msg.from,message: msg.message, username: msg.username});
                   socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
-                  yield setTimeout(suspend.resume(), 1000); // 10 seconds pass..
                   Message.findByIdAndRemove(msg._id).exec();
+              });
+              */
+
+              forEach(messages, function(msg) {
+                socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
+                Message.findByIdAndRemove(msg._id).exec();
+                var done = this.async();
+                setTimeout(done, 500);
               });
              //socket.emit('bulk_incoming_message', bulk);
               //console.log({from: msg.from,message: msg.message, username: msg.username});
