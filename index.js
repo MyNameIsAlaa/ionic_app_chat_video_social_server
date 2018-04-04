@@ -61,7 +61,9 @@ app.use('/peerjs', ExpressPeerServer(http, options));
 
 
 io.on('connection', function (socket) {
+
     socket.on("id", (data)=>{
+
         if(! Mongose.Types.ObjectId.isValid(data.id)) return;
         User.findOne({_id: Mongose.Types.ObjectId(data.id)},(err, result)=>{
             if(err) return;
@@ -69,16 +71,6 @@ io.on('connection', function (socket) {
             result.online = true;
             result.socket = socket.id;
             result.save((err)=>{
-            });
-            Message.find({to:Mongose.Types.ObjectId(data.id) }, (err, messages)=>{
-                messages.forEach((msg)=>{
-                    socket.to(socket.id).emit('incoming_message',{
-                        from: msg.from,
-                        message: msg.message,
-                        username: msg.username
-                    });
-                    Message.findByIdAndRemove(msg._id).exec();
-                });
             });
             Friends.find({Owner: Mongose.Types.ObjectId(data.id) }).populate({
                 path: "Friend",
@@ -88,8 +80,18 @@ io.on('connection', function (socket) {
                     if(item.Friend) socket.to(item.Friend.socket).emit('friend_online', {id: data.id});
                 });
             });
+            Message.find({to: Mongose.Types.ObjectId(data.id) }, (err, messages)=>{
+                messages.forEach((msg)=>{
+                  socket.to(socket.id).emit('incoming_message',{
+                      from: msg.from,
+                      message: msg.message,
+                      username: msg.username
+                  });
+                  Message.findByIdAndRemove(msg._id).exec();
+              });
+          });
         });     
-        // get all user friends who are online and emit to them he is online now!
+       
     });
     
     socket.on('disconnect', (reason) => {
