@@ -97,6 +97,7 @@ io.on('connection', function (socket) {
                 messages.forEach((msg)=>{
                   socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
                   Message.findByIdAndRemove(msg._id).exec();
+                  wait(1000); // wait 1000 milliseconds
               });
               
 
