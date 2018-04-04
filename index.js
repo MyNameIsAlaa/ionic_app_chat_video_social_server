@@ -99,7 +99,7 @@ io.on('connection', function (socket) {
                 messages.forEach((msg)=>{
                //   bulk.push({from: msg.from,message: msg.message, username: msg.username});
                   socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
-                 
+                  yield setTimeout(suspend.resume(), 1000); // 10 seconds pass..
                   Message.findByIdAndRemove(msg._id).exec();
               });
              //socket.emit('bulk_incoming_message', bulk);
