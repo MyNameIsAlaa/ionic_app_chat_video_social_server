@@ -19,7 +19,19 @@ var passport = require("passport");
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 
+var admin = require("firebase-admin");
 
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./firebase/chatapp-17m-firebase-adminsdk-fzoem-473903246d.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://chatapp-17m.firebaseio.com"
+});
+
+  
 
 
 var opts = {}
@@ -112,10 +124,13 @@ io.on('connection', function (socket) {
     });
 
     socket.on('private message', (data)=>{
-          console.log(data);
            //data =  { from: ,to: , message: }
            if(! Mongose.Types.ObjectId.isValid(data.to)) return;
            User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
+
+               var message = { notification: { title: data.username, body: data.message},topic: data.to };
+               admin.messaging().send(message).then((response) => { }) .catch((error) => { console.log('Error sending message:', error);});
+
                  if(user.online){
                       // user is online send it socket.to(<socketid>).emit('hey', 'I just met you');
                         socket.to(user.socket).emit('incoming_message',{
