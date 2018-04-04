@@ -105,7 +105,7 @@ io.on('connection', function (socket) {
                 socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
                 Message.findByIdAndRemove(msg._id).exec();
                 var done = this.async();
-                setTimeout(done, 500);
+                setTimeout(done, 1000);
               });
              //socket.emit('bulk_incoming_message', bulk);
               //console.log({from: msg.from,message: msg.message, username: msg.username});
