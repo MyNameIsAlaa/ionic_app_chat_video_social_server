@@ -101,7 +101,7 @@ io.on('connection', function (socket) {
               });
               */
 
-              forEach(messages, function(msg) {
+              forEach(messages, (msg)=> {
                 socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
                 Message.findByIdAndRemove(msg._id).exec();
                 var done = this.async();
