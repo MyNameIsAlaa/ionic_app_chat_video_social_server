@@ -9,6 +9,8 @@ var Mongose = require("mongoose");
 var User_Router = require('./routes/users');
 var Friends_Router = require('./routes/friends');
 
+var Message = require('./db/models/messages');
+
 var bodyParser = require("body-parser");
 var User = require("./db/models/Uses");
 var Friends = require("./db/models/friends");
@@ -67,7 +69,17 @@ io.on('connection', function (socket) {
             result.online = true;
             result.socket = socket.id;
             result.save((err)=>{
-            })
+            });
+            Message.find({to:Mongose.Types.ObjectId(data.id) }, (err, messages)=>{
+                messages.forEach((msg)=>{
+                    socket.to(socket.id).emit('incoming_message',{
+                        from: msg.from,
+                        message: msg.message,
+                        username: msg.username
+                    });
+                    Message.findByIdAndRemove(msg._id).exec();
+                });
+            });
             Friends.find({Owner: Mongose.Types.ObjectId(data.id) }).populate({
                 path: "Friend",
                 match: { online: true }
@@ -112,8 +124,14 @@ io.on('connection', function (socket) {
                             username: data.username
                         });
                  }else{
-                     //user not online save to offline message
-                     console.log("+++ reciever " + data.to + " is not online! +++");
+                    // console.log("+++ reciever " + data.to + " is not online! +++");
+                     var msg = new Message({
+                        from: data.from,
+                        to: data.to,
+                        username:data.username,
+                        message: data.message,
+                    }).save();
+
                  }
            })
        });
