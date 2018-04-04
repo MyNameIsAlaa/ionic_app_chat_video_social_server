@@ -101,7 +101,7 @@ io.on('connection', function (socket) {
                   Message.findByIdAndRemove(msg._id).exec();
               });
               socket.emit('bulk_incoming_message', bulk);
-              console.log({from: msg.from,message: msg.message, username: msg.username});
+              //console.log({from: msg.from,message: msg.message, username: msg.username});
           });
         });     
        
