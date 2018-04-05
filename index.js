@@ -92,17 +92,15 @@ io.on('connection', function (socket) {
             });
             Message.find({to: Mongose.Types.ObjectId(data.id) }, (err, messages)=>{
                 if(err) return;
-              
+                var bulk = [];
                 if(!messages) return;
                 messages.forEach((msg)=>{
-                  socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
+                  //socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
+                  bulk.push({from: msg.from,message: msg.message, username: msg.username});
                   Message.findByIdAndRemove(msg._id).exec();
                  
-              });
-              
-
-    
-             //socket.emit('bulk_incoming_message', bulk);
+                 });
+                socket.emit('bulk_incoming_message', bulk);
               //console.log({from: msg.from,message: msg.message, username: msg.username});
           });
         });     
