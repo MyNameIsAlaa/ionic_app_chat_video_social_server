@@ -8,6 +8,8 @@ var Mongose = require("mongoose");
 
 var User_Router = require('./routes/users');
 var Friends_Router = require('./routes/friends');
+var Files_Router = require('./routes/files');
+
 
 var Message = require('./db/models/messages');
 
@@ -59,6 +61,7 @@ app.use(function(req, res, next) {
 
 app.use('/api/user', User_Router);
 app.use('/api/friends', Friends_Router);
+app.use('/api/files', Files_Router);
 
 
 
