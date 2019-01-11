@@ -1,6 +1,6 @@
-
 var config = require("./config/config");
-var app = require("express")();
+var express = require("express");
+var app = express();
 var http = require('http').Server(app);
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 var io = require('socket.io')(http);
@@ -9,6 +9,8 @@ var Mongose = require("mongoose");
 var User_Router = require('./routes/users');
 var Friends_Router = require('./routes/friends');
 var Files_Router = require('./routes/files');
+var Posts_Router = require('./routes/posts');
+var Comments_Router = require('./routes/comments');
 
 
 var Message = require('./db/models/messages');
@@ -57,21 +59,17 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next();
-  });
+});
 
+app.use('/uploads', express.static('uploads'))
 app.use('/api/user', User_Router);
 app.use('/api/friends', Friends_Router);
 app.use('/api/files', Files_Router);
+app.use('/api/posts', Posts_Router);
+app.use('/api/comments', Comments_Router);
 
 
-
-var options = {
-    debug: true
-}
-
-app.use('/peerjs', ExpressPeerServer(http, options));
-
-
+app.use('/peerjs', ExpressPeerServer(http, {debug: true}));
 
 io.on('connection', function (socket) {
 
@@ -98,13 +96,20 @@ io.on('connection', function (socket) {
                 var bulk = [];
                 if(!messages) return;
                 messages.forEach((msg)=>{
-                  //socket.emit('incoming_message', {from: msg.from,message: msg.message, username: msg.username});
-                  bulk.push({from: msg.from,message: msg.message, username: msg.username});
+
+                  bulk.push({
+                    from: msg.from,
+                    message: msg.message,
+                    username: msg.username,
+                    first_name: msg.first_name,
+                    last_name: msg.last_name,
+                });
+
                   Message.findByIdAndRemove(msg._id).exec();
                  
                  });
                 socket.emit('bulk_incoming_message', bulk);
-              //console.log({from: msg.from,message: msg.message, username: msg.username});
+             
           });
         });     
        
@@ -134,30 +139,60 @@ io.on('connection', function (socket) {
            if(! Mongose.Types.ObjectId.isValid(data.to)) return;
            User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
 
-               var message = { notification: { title: data.username, body: data.message},topic: data.to };
-               admin.messaging().send(message).then((response) => { }) .catch((error) => { console.log('Error sending message:', error);});
+            var message = { notification: { title: data.username, body: data.message},topic: data.to };
+            admin.messaging().send(message).then((response) => { }) .catch((error) => { console.log('Error sending GCM notification:', error);});
 
-                 if(user.online){
-                      // user is online send it socket.to(<socketid>).emit('hey', 'I just met you');
-                        socket.to(user.socket).emit('incoming_message',{
-                            from: data.from,
-                            message: data.message,
-                            username: data.username
-                        });
-                 }else{
-                    // console.log("+++ reciever " + data.to + " is not online! +++");
-                     var msg = new Message({
-                        from: data.from,
-                        to: data.to,
-                        username:data.username,
-                        message: data.message,
-                    }).save();
+            let userOnline = user.online;
 
-                 }
+                User.findOne({_id:Mongose.Types.ObjectId(data.from)}, (eror, sender)=>{
+
+                    if(userOnline){
+                        // user is ONLINE send it socket.to(<socketid>).emit();
+                          socket.to(user.socket).emit('incoming_message',{
+                              from: data.from,
+                              message: data.message,
+                              username: sender.username,
+                              first_name: sender.first_name,
+                              last_name: sender.last_name,
+                          });
+                   }else{
+                      // user is OFFLINE save msg to db
+                       var msg = new Message({
+                          from: data.from,
+                          to: data.to,
+                          username:sender.username,
+                          message: data.message,
+                          first_name: sender.first_name,
+                          last_name: sender.last_name,
+                      }).save();
+  
+                   }
+
+
+                })
+
            })
        });
 
+       socket.on('videocall_call', (data)=>{
+        User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
+            socket.to(user.socket).emit('videocall_call',{
+                from: data.from,
+                username: data.username,
+                signal: data.signal
+               });
+         });
+       });
 
+       socket.on('videocall_answer', (data)=>{
+         User.findOne({_id:Mongose.Types.ObjectId(data.to)},(error, user)=>{
+            socket.to(user.socket).emit('videocall_answer',{
+                from: data.from,
+                username: data.username,
+                signal: data.signal
+               });
+         });
+       });
  
 });
 
@@ -165,6 +200,6 @@ io.on('connection', function (socket) {
 
 
 
-var listener = http.listen(process.env.PORT || 8080,()=>{
+var listener = http.listen(process.env.PORT || 3000,()=>{
   console.log('listening on port ' + listener.address().port);
 });

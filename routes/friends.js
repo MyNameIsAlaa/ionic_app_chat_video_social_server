@@ -7,13 +7,19 @@ var config = require("../config/config");
 var passport = require("passport");
 var JWT = require("jsonwebtoken");
 
+var deepPopulate = require('mongoose-deep-populate')(Mongoose);
+
 Mongoose.connect(config.mlab.URL,(error)=>{
   if(error) console.log(error);
 });
 
 
 Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
-    Friend.find({Owner: Mongoose.Types.ObjectId(req.user._id)}).populate("Friend", "-password").exec((error, friends)=>{
+  /*  Friend.find({Owner: Mongoose.Types.ObjectId(req.user._id)}).populate({
+      path : 'Friend profile_pic',
+      select: '-password',
+      model: 'User'
+    }).exec((error, friends)=>{
         if(error) return res.status(500).json({"error": error});
         let data = [];
         if(friends){
@@ -21,7 +27,22 @@ Router.get('/', passport.authenticate('jwt', {session: false}), (req,res)=>{
                data.push(friend.Friend)
               });
             return res.status(200).json(data);
-        } 
+        }else{
+          return res.status(200).json("none");
+        }
+    });
+*/
+    Friend.find({Owner: Mongoose.Types.ObjectId(req.user._id)}).deepPopulate('Friend Friend.profile_pic').select("-Friend.password").exec((error, friends)=>{
+      if(error) return res.status(500).json({"error": error});
+      let data = [];
+      if(friends){
+            friends.forEach(function(friend) {
+             data.push(friend.Friend)
+            });
+          return res.status(200).json(data);
+      }else{
+        return res.status(200).json("none");
+      }
     })
 });
 
@@ -51,8 +72,7 @@ Router.post('/add', passport.authenticate('jwt', {session: false}), (req,res)=>{
 });
 
 
-Router.post('/delete', passport.authenticate('jwt', {session: false}), (req,res)=>{
-
+Router.delete('/delete', passport.authenticate('jwt', {session: false}), (req,res)=>{
    Friend.findOne({
        Owner: req.user._id,
        Friend: req.body.userID
@@ -60,7 +80,6 @@ Router.post('/delete', passport.authenticate('jwt', {session: false}), (req,res)
       if(error) return res.status(500).json({"error": error});
       res.status(200).json({"success": "Friend deleted!"});
    });
- 
  });
  
 

@@ -4,9 +4,7 @@ var FileDB = require("../db/models/files");
 var path = require('path');
 var fs = require('fs');
 var util = require('util');
-
 var formidable = require('formidable');
-
 var Mongoose = require("mongoose");
 var config = require("../config/config");
 var passport = require("passport");
@@ -27,11 +25,22 @@ Router.get('/', passport.authenticate('jwt', { session: false }), (req,res)=>{
 });
 
 
-Router.get('/:file', passport.authenticate('jwt', { session: false }), (req,res)=>{
+Router.get('/:file', (req,res)=>{
     fs.exists(__dirname + '/../uploads/'  + req.params.file, (exists)=>{
         if( !exists) return res.status(500).json({"message": "File Not Found!"});
         res.status(200).sendFile(path.resolve(__dirname + '/../uploads/' + req.params.file));
     });
+});
+
+
+
+Router.get('/ID/:id', (req,res)=>{
+   FileDB.findById(Mongoose.Types.ObjectId(this.params.id),(err, result)=>{
+      fs.exists(__dirname + '/../uploads/'  + result.fileName, (exists)=>{
+      if( !exists) return res.status(500).json({"message": "File Not Found!"});
+      res.status(200).sendFile(path.resolve(__dirname + '/../uploads/' + result.fileName));
+      });
+   })
 });
 
 
@@ -59,21 +68,36 @@ Router.post('/upload',passport.authenticate('jwt', { session: false }), (req,res
    });
  
    form.on('end', function() {
-     for(var file in files){
-       let myFile = new FileDB({
-        Owner: OwnderID,
-        fileName: files[file]
-      }).save();
-     }
-     res.status(200).send(files);
+    var Prepare = [];
+    var promises = files.map((file)=>{
+       return new Promise((resolve, reject)=>{
+           let myFile = new FileDB({
+            Owner: OwnderID,
+            fileName: file,
+            file_url:  config.app.upload_url + file
+            }).save((err, file)=>{
+            if(err) return reject(err);
+            Prepare.push({
+             'id': file._id,
+             'fileName': file.fileName,
+             'file_url': config.app.upload_url + file.fileName
+            });
+            resolve();
+           })
+       })
+     });
+     Promise.all(promises).then(()=>{
+      res.status(200).send(Prepare);
+     })
    });
- 
+
    form.parse(req);
-
-  });
-
  
  });
+
+
+
+})
  
 
 
