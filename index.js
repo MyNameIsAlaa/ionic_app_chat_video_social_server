@@ -1,4 +1,3 @@
-var config = require("./config/config");
 var express = require("express");
 var app = express();
 var http = require('http').Server(app);
@@ -24,12 +23,18 @@ var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 
 
+const Config = require('./config');
+
+
+Mongoose.connect(Config.MongoDB.URL, (error) => {
+    if (error) console.log(error);
+});
 
 
 
 var opts = {}
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = 'NineVisions';
+opts.secretOrKey = Config.JWT.secretOrKey;
 passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
     User.findOne({ _id: jwt_payload._id }).select("-password").exec(function (err, user) {
         if (err) {
@@ -191,6 +196,6 @@ io.on('connection', function (socket) {
 
 
 
-var listener = http.listen(process.env.PORT || 3000, () => {
+var listener = http.listen(, () => {
     console.log('listening on port ' + listener.address().port);
 });
