@@ -196,6 +196,6 @@ io.on('connection', function (socket) {
 
 
 
-var listener = http.listen(, () => {
+var listener = http.listen(Config.http.port, () => {
     console.log('listening on port ' + listener.address().port);
 });
