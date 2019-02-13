@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 var io = require('socket.io')(http);
-var Mongose = require("mongoose");
+var Mongoose = require("mongoose");
 
 var User_Router = require('./routes/users');
 var Friends_Router = require('./routes/friends');
@@ -71,15 +71,15 @@ io.on('connection', function (socket) {
 
     socket.on("id", (data) => {
 
-        if (!Mongose.Types.ObjectId.isValid(data.id)) return;
-        User.findOne({ _id: Mongose.Types.ObjectId(data.id) }, (err, result) => {
+        if (!Mongoose.Types.ObjectId.isValid(data.id)) return;
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.id) }, (err, result) => {
             if (err) return;
             if (!result) return;
             result.online = true;
             result.socket = socket.id;
             result.save((err) => {
             });
-            Friends.find({ Owner: Mongose.Types.ObjectId(data.id) }).populate({
+            Friends.find({ Owner: Mongoose.Types.ObjectId(data.id) }).populate({
                 path: "Friend",
                 match: { online: true }
             }).exec((err, friends) => {
@@ -87,7 +87,7 @@ io.on('connection', function (socket) {
                     if (item.Friend) socket.to(item.Friend.socket).emit('friend_online', { id: data.id });
                 });
             });
-            Message.find({ to: Mongose.Types.ObjectId(data.id) }, (err, messages) => {
+            Message.find({ to: Mongoose.Types.ObjectId(data.id) }, (err, messages) => {
                 if (err) return;
                 var bulk = [];
                 if (!messages) return;
@@ -119,7 +119,7 @@ io.on('connection', function (socket) {
             result.socket = '';
             result.save((err) => {
             })
-            Friends.find({ Owner: Mongose.Types.ObjectId(result._id) }).populate({
+            Friends.find({ Owner: Mongoose.Types.ObjectId(result._id) }).populate({
                 path: "Friend",
                 match: { online: true }
             }).exec((err, friends) => {
@@ -132,15 +132,15 @@ io.on('connection', function (socket) {
 
     socket.on('private message', (data) => {
         //data =  { from: ,to: , message: }
-        if (!Mongose.Types.ObjectId.isValid(data.to)) return;
-        User.findOne({ _id: Mongose.Types.ObjectId(data.to) }, (error, user) => {
+        if (!Mongoose.Types.ObjectId.isValid(data.to)) return;
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
 
             var message = { notification: { title: data.username, body: data.message }, topic: data.to };
             admin.messaging().send(message).then((response) => { }).catch((error) => { console.log('Error sending GCM notification:', error); });
 
             let userOnline = user.online;
 
-            User.findOne({ _id: Mongose.Types.ObjectId(data.from) }, (eror, sender) => {
+            User.findOne({ _id: Mongoose.Types.ObjectId(data.from) }, (eror, sender) => {
 
                 if (userOnline) {
                     // user is ONLINE send it socket.to(<socketid>).emit();
@@ -171,7 +171,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('videocall_call', (data) => {
-        User.findOne({ _id: Mongose.Types.ObjectId(data.to) }, (error, user) => {
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
             socket.to(user.socket).emit('videocall_call', {
                 from: data.from,
                 username: data.username,
@@ -181,7 +181,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('videocall_answer', (data) => {
-        User.findOne({ _id: Mongose.Types.ObjectId(data.to) }, (error, user) => {
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
             socket.to(user.socket).emit('videocall_answer', {
                 from: data.from,
                 username: data.username,
