@@ -1,0 +1,12 @@
+{
+    "script": "index.js",
+    "watch": true,
+    "i": "max",
+    "ignore_watch": [
+        "node_modules",
+        "temp"
+    ],
+    "watch_options": {
+        "followSymlinks": false
+    }
+}
