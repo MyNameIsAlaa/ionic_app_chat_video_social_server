@@ -22,7 +22,7 @@ const CORS = require('cors');
 const Config = require('./config');
 
 
-Mongoose.connect(Config.MongoDB.URL, (error) => {
+Mongoose.connect(Config.MongoDB.URL, { useNewUrlParser: true }, (error) => {
     if (error) console.log(error);
 });
 
