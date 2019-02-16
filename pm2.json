@@ -1,6 +1,6 @@
 {
     "script": "index.js",
-    "watch": true,
+    "watch": false,
     "i": "max",
     "ignore_watch": [
         "node_modules",
