@@ -4,14 +4,11 @@ var http = require('http').Server(app);
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 var io = require('socket.io')(http);
 var Mongoose = require("mongoose");
-
 var User_Router = require('./routes/users');
 var Friends_Router = require('./routes/friends');
 var Files_Router = require('./routes/files');
 var Posts_Router = require('./routes/posts');
 var Comments_Router = require('./routes/comments');
-
-
 var Message = require('./db/models/messages');
 
 var bodyParser = require("body-parser");
@@ -21,8 +18,7 @@ var Friends = require("./db/models/friends");
 var passport = require("passport");
 var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
-
-
+const CORS = require('cors');
 const Config = require('./config');
 
 
@@ -48,21 +44,18 @@ passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
     });
 }));
 
+app.use(CORS());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    next();
-});
-
 app.use('/uploads', express.static('uploads'))
 app.use('/api/user', User_Router);
 app.use('/api/friends', Friends_Router);
 app.use('/api/files', Files_Router);
 app.use('/api/posts', Posts_Router);
 app.use('/api/comments', Comments_Router);
+app.use('*', (req, res) => {
+    res.send("Your request is not found in this sevrer!.");
+})
 
 
 app.use('/peerjs', ExpressPeerServer(http, { debug: true }));
@@ -169,27 +162,27 @@ io.on('connection', function (socket) {
 
         })
     });
-
-    socket.on('videocall_call', (data) => {
-        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
-            socket.to(user.socket).emit('videocall_call', {
-                from: data.from,
-                username: data.username,
-                signal: data.signal
+    /*
+        socket.on('videocall_call', (data) => {
+            User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
+                socket.to(user.socket).emit('videocall_call', {
+                    from: data.from,
+                    username: data.username,
+                    signal: data.signal
+                });
             });
         });
-    });
-
-    socket.on('videocall_answer', (data) => {
-        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
-            socket.to(user.socket).emit('videocall_answer', {
-                from: data.from,
-                username: data.username,
-                signal: data.signal
+    
+        socket.on('videocall_answer', (data) => {
+            User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
+                socket.to(user.socket).emit('videocall_answer', {
+                    from: data.from,
+                    username: data.username,
+                    signal: data.signal
+                });
             });
         });
-    });
-
+    */
 });
 
 
