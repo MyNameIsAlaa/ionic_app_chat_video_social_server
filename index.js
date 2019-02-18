@@ -3,6 +3,8 @@ var app = express();
 var http = require('http').Server(app);
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 var io = require('socket.io')(http);
+const RTCMultiConnectionServer = require('rtcmulticonnection-server');
+
 var Mongoose = require("mongoose");
 var User_Router = require('./routes/users');
 var Friends_Router = require('./routes/friends');
@@ -20,6 +22,19 @@ var JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt;
 const CORS = require('cors');
 const Config = require('./config');
+
+
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./firebase/chatapp-17m-firebase-adminsdk-fzoem-473903246d.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://chatapp-17m.firebaseio.com"
+});
+
+
 
 
 Mongoose.connect(Config.MongoDB.URL, { useNewUrlParser: true }, (error) => {
@@ -58,9 +73,11 @@ app.use('*', (req, res) => {
 })
 
 
-app.use('/peerjs', ExpressPeerServer(http, { debug: true }));
+//app.use('/peerjs', ExpressPeerServer(http, { debug: true }));
 
 io.on('connection', function (socket) {
+
+    RTCMultiConnectionServer.addSocket(socket);
 
     socket.on("id", (data) => {
 
@@ -162,27 +179,28 @@ io.on('connection', function (socket) {
 
         })
     });
-    /*
-        socket.on('videocall_call', (data) => {
-            User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
-                socket.to(user.socket).emit('videocall_call', {
-                    from: data.from,
-                    username: data.username,
-                    signal: data.signal
-                });
+
+    socket.on('videocall_call', (data) => {
+        console.log(data)
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
+            socket.to(user.socket).emit('videocall_call', {
+                from: data.from,
+                username: data.username,
+                channel: data.channel
             });
         });
-    
-        socket.on('videocall_answer', (data) => {
-            User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
-                socket.to(user.socket).emit('videocall_answer', {
-                    from: data.from,
-                    username: data.username,
-                    signal: data.signal
-                });
+    });
+
+    socket.on('videocall_answer', (data) => {
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
+            socket.to(user.socket).emit('videocall_answer', {
+                from: data.from,
+                username: data.username,
+                channel: data.channel
             });
         });
-    */
+    });
+
 });
 
 

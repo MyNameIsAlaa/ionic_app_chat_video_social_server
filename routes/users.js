@@ -7,8 +7,9 @@ var FileDB = require("../db/models/files");
 var path = require('path');
 var async = require('async');
 var passport = require("passport");
+var Mongoose = require("mongoose");
 var JWT = require("jsonwebtoken");
-
+const Config = require('../config');
 
 
 Router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -224,7 +225,7 @@ Router.post('/login', (req, res) => {
     if (error) return res.status(500).json({ "message": "Unable to login" });
     if (!user) return res.status(500).json({ "message": "WRONG USERNAME & PASSWORD!" });
     res.status(200).json({
-      "token": JWT.sign({ _id: user._id }, "NineVisions"),
+      "token": JWT.sign({ _id: user._id }, Config.JWT.secretOrKey),
       "user": user
     });
   });

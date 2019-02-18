@@ -8,7 +8,7 @@ const Config = {
     'secretOrKey': process.env.JWT_secretOrKey || 'NineVisionsDotCom'
   },
   MongoDB: {
-    URL: process.env.mongoURL || "mongodb://alaa:alaa123@cluster0-shard-00-00-lk6ns.mongodb.net:27017,cluster0-shard-00-01-lk6ns.mongodb.net:27017,cluster0-shard-00-02-lk6ns.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
+    URL: process.env.mongoURL || "mongodb://alaa:alaa123@cluster0-shard-00-00-n8ntj.mongodb.net:27017,cluster0-shard-00-01-n8ntj.mongodb.net:27017,cluster0-shard-00-02-n8ntj.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
   }
 };
 
