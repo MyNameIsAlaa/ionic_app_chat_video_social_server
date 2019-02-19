@@ -1,7 +1,7 @@
 require('dotenv').config();
 const Config = {
   http: {
-    domain: process.env.domain || 'http://18.218.141.139',
+    domain: process.env.domain || 'http://13.58.246.198',
     port: process.env.port || 9988
   },
   JWT: {
