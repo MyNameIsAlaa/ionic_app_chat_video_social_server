@@ -201,6 +201,16 @@ io.on('connection', function (socket) {
         });
     });
 
+    socket.on('cancel_videocall_call', (data) => {
+        User.findOne({ _id: Mongoose.Types.ObjectId(data.to) }, (error, user) => {
+            socket.to(user.socket).emit('cancel_videocall_call', {
+                from: data.from,
+                username: data.username,
+                channel: data.channel
+            });
+        });
+    });
+
 });
 
 
