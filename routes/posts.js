@@ -136,14 +136,12 @@ Router.delete('/:postID', passport.authenticate('jwt', { session: false }), (req
 
 Router.post('/like', passport.authenticate('jwt', { session: false }), (req, res) => {
   UserID = req.user._id;
-  if (req.body.PostID) { PostID = req.body.postID; } else {
+  if (!req.body.PostID) {
     return res.status(500).json({ "message": "Post ID is required!" });
   }
-  //if (!Mongoose.Types.ObjectId.isValid(PostID)) return res.status(500).json({ "message": "POST ID NOT VALID!" });
-
-
+  if (!Mongoose.Types.ObjectId.isValid(req.body.postID)) return res.status(500).json({ "message": "POST ID NOT VALID!" });
   Post.findOne({
-    _id: Mongoose.Types.ObjectId(PostID),
+    _id: Mongoose.Types.ObjectId(req.body.postID),
   }, (error, post) => {
     if (error) return res.status(500).json({ "message": "error like post " + error });
     post.likes.push(UserID);
