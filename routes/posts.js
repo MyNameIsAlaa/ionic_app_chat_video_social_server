@@ -139,7 +139,7 @@ Router.post('/like', passport.authenticate('jwt', { session: false }), (req, res
   if (req.body.PostID) { PostID = req.body.postID; } else {
     return res.status(500).json({ "message": "Post ID is required!" });
   }
-  if (!Mongoose.Types.ObjectId.isValid(PostID)) return res.status(500).json({ "message": "POST ID NOT VALID!" });
+  //if (!Mongoose.Types.ObjectId.isValid(PostID)) return res.status(500).json({ "message": "POST ID NOT VALID!" });
 
 
   Post.findOne({
